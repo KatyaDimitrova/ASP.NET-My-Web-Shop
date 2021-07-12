@@ -58,5 +58,20 @@
                 Name=c.Name
             })
             .ToList();
+
+
+        public IActionResult All()
+        {
+            var cartridges = this.data.Cartridges.Select(x => new AllCartridgesViewModel
+            {
+                Model = x.Model,
+                Description = x.Description,
+                ImageUrl = x.ImageUrl,
+                Colour=x.Colour.Name,
+            })
+            .ToList();
+
+            return this.View(cartridges);
+        }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace MyWebShop.Data
+﻿using Microsoft.EntityFrameworkCore;
+using MyWebShop.Models.Cartridges;
+namespace MyWebShop.Data
 {
     using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore;
@@ -25,5 +27,7 @@
 
             base.OnModelCreating(builder);
         }
+
+        public DbSet<MyWebShop.Models.Cartridges.AllCartridgesViewModel> AllCartridgesViewModel { get; set; }
     }
 }

@@ -33,8 +33,8 @@
             data.Colours.AddRange(new[]
             {
                 new Colour {Name="Black"},
-                new Colour {Name="Cian"},
-                new Colour {Name="Red"},
+                new Colour {Name="Cyan"},
+                new Colour {Name="Magenta"},
                 new Colour {Name="Yellow"}
             });
 

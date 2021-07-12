@@ -1,0 +1,28 @@
+﻿@model IEnumerable<MyWebShop.Models.Cartridges.AllCartridgesViewModel>
+
+@{
+    ViewData["Title"] = "All";
+}
+
+<h1>Top Products</h1>
+
+<body>
+    <div class="nk-gap-3"></div>
+    <h3 class="nk-decorated-h-2"><span><span class="text-main-1">Best</span>Selling</span></h3>
+    <div class="row vertical-gap">
+
+        @foreach (var cartridge in Model)
+        {
+        <div class="card col-6 col-lg-3 game-card">
+            <img src="@cartridge.ImageUrl"
+                 class="card-img-top img-fluid card-image rounded" data-toggle="tooltip"
+                 data-placement="bottom" title="@cartridge.Model">
+            <div class="card-body">
+                
+                <a href="/Details/CartridgeDetails?cartridgeId=@cartridge.Id" class="btn btn-block btn-primary">Details</a>
+            </div>
+        </div>
+        }
+
+    </div>
+</body>
