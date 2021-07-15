@@ -1,28 +1,103 @@
-﻿@model IEnumerable<MyWebShop.Models.Cartridges.AllCartridgesViewModel>
+﻿@model CartridgesSearchQueryModel
 
 @{
-    ViewData["Title"] = "All";
+    ViewData["Title"] = "All Cartridges";
 }
 
-<h1>Top Products</h1>
+<form method="get">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="form-group">
+                <div class="form-group">
+                    <label asp-for="PrinterBrand"></label>
+                    <select asp-for="PrinterBrand" class="form-control">
+                        <option value="">All</option>
 
-<body>
-    <div class="nk-gap-3"></div>
-    <h3 class="nk-decorated-h-2"><span><span class="text-main-1">Best</span>Selling</span></h3>
-    <div class="row vertical-gap">
-
-        @foreach (var cartridge in Model)
-        {
-        <div class="card col-6 col-lg-3 game-card">
-            <img src="@cartridge.ImageUrl"
-                 class="card-img-top img-fluid card-image rounded" data-toggle="tooltip"
-                 data-placement="bottom" title="@cartridge.Model">
-            <div class="card-body">
-                
-                <a href="/Details/CartridgeDetails?cartridgeId=@cartridge.Id" class="btn btn-block btn-primary">Details</a>
+                        @foreach (var brand in Model.PrintersBrands)
+                        {
+                            <option value="@brand">@brand</option>
+                        }
+                    </select>
+                </div>
             </div>
         </div>
+
+        <div class="col-md-3">
+            <div class="form-group">
+                <label asp-for="SearchTerm"></label>
+                <input asp-for="SearchTerm" class="form-control" placeholder="Search...">
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="form-group">
+                <div class="form-group">
+                    <label asp-for="Sorting"></label>
+                    <select asp-for="Sorting" class="form-control">
+                        <option value="0">Date Created</option>
+                        <option value="1">PrinterBrand And Model</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <input type="submit" class="btn btn-primary" value="Search">
+            </div>
+        </div>
+    </div>
+</form>
+
+
+<body>
+
+    <div class="row">
+
+        @foreach (var cartridge in Model.Cartridges)
+        {
+            <div class="col-xl-4">
+                <div class="card mb-4">
+                    <img class="d-block w-75" src="@cartridge.ImageUrl" alt="@cartridge.Printer @cartridge.Model @cartridge.Price (@cartridge.Colour)">
+                    <div class="card-body text-center">
+                        <h5 class="card-title text-center">@cartridge.Price @cartridge.Printer @cartridge.Model @cartridge.Colour</h5>
+                        <a asp-controller="Cartridges" asp-action="Details" asp-route-id="@cartridge.Id" class="btn btn-primary">Details</a>
+                    </div>
+                </div>
+            </div>
         }
 
+
     </div>
+
+    @{ 
+        var previousPage = Model.CurrentPage - 1;
+        if (previousPage<1)
+        {
+            previousPage = 1;
+        }
+
+        var maxPage = Math.Ceiling((double)Model.TotalCartridges / CartridgesSearchQueryModel.CartridgesPerPage);
+      }
+
+    <div class="row text-center" >
+        <div class="col-md-6">
+            <a class="btn btn-primary @(Model.CurrentPage==1 ?"disabled":string.Empty)"
+               asp-controller="Cartridges" 
+               asp-action="All" 
+               asp-route-currentPage="@previousPage"
+               asp-route-printerBrand="@Model.PrinterBrand"
+               asp-route-searchTerm="@Model.SearchTerm"
+               asp-route-Sorting="@((int)Model.Sorting)">Previous Page</a>
+        </div>
+        <div class="col-md-6">
+            <a class="btn btn-primary @(Model.CurrentPage==maxPage ?"disabled":string.Empty)"
+               asp-controller="Cartridges" 
+               asp-action="All" 
+               asp-route-currentPage="@(Model.CurrentPage+1)"
+               asp-route-printerBrand="@Model.PrinterBrand"
+               asp-route-searchTerm="@Model.SearchTerm"
+               asp-route-Sorting="@((int)Model.Sorting)">Next Page</a>
+        </div>
+    </div>
+
 </body>

@@ -9,11 +9,14 @@
         [Required]
         [MaxLength(CartridgeModelMaxLength)]
         public string Model { get; set; }
+        public decimal Price { get; set; }
         [Required]
         public string Description { get; set; }
         [Required]
         public string ImageUrl { get; set; }
         public int ColourId { get; set; }
         public Colour Colour { get; init; }
+        public int PrinterId { get; set; }
+        public Printer Printer { get; init; }
     }
 }

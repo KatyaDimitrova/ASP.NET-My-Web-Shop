@@ -219,7 +219,7 @@ namespace MyWebShop.Data.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("MyWebShop.Data.NewFolder.Cartridge", b =>
+            modelBuilder.Entity("MyWebShop.Data.Models.Cartridge", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -242,14 +242,22 @@ namespace MyWebShop.Data.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("PrinterId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ColourId");
 
+                    b.HasIndex("PrinterId");
+
                     b.ToTable("Cartridges");
                 });
 
-            modelBuilder.Entity("MyWebShop.Data.NewFolder.Colour", b =>
+            modelBuilder.Entity("MyWebShop.Data.Models.Colour", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -262,6 +270,45 @@ namespace MyWebShop.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Colours");
+                });
+
+            modelBuilder.Entity("MyWebShop.Data.Models.Printer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Brand")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Printers");
+                });
+
+            modelBuilder.Entity("MyWebShop.Models.Cartridges.AllCartridgesViewModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Colour")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Model")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AllCartridgesViewModel");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -315,18 +362,31 @@ namespace MyWebShop.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("MyWebShop.Data.NewFolder.Cartridge", b =>
+            modelBuilder.Entity("MyWebShop.Data.Models.Cartridge", b =>
                 {
-                    b.HasOne("MyWebShop.Data.NewFolder.Colour", "Colour")
+                    b.HasOne("MyWebShop.Data.Models.Colour", "Colour")
                         .WithMany("Cartridges")
                         .HasForeignKey("ColourId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("MyWebShop.Data.Models.Printer", "Printer")
+                        .WithMany("Cartridges")
+                        .HasForeignKey("PrinterId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Colour");
+
+                    b.Navigation("Printer");
                 });
 
-            modelBuilder.Entity("MyWebShop.Data.NewFolder.Colour", b =>
+            modelBuilder.Entity("MyWebShop.Data.Models.Colour", b =>
+                {
+                    b.Navigation("Cartridges");
+                });
+
+            modelBuilder.Entity("MyWebShop.Data.Models.Printer", b =>
                 {
                     b.Navigation("Cartridges");
                 });

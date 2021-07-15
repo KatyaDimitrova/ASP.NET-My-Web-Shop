@@ -2,6 +2,8 @@
 
 @{ ViewData["Title"] = "Add Cartridge"; }
 
+
+
 <div class="row">
     <div class="col-sm-12 offset-lg-2 col-lg-8 offset-xl-3 col-xl-6">
         <h2 class="heading-margin text-center">Add Cartridge</h2>
@@ -23,12 +25,24 @@
                 <span asp-validation-for="ImageUrl" class="small text-danger"></span>
             </div>
             <div class="form-group">
+                <label asp-for="Price"></label>
+                <input asp-for="Price" class="form-control" placeholder="Type Price here...">
+
+            </div>
+            <div class=" form-group">
                 <label asp-for="ColourId"></label>
                 <select asp-for="ColourId" class="form-control">
                     @foreach (var colour in Model.Colours)
                     {
-                       <option value="@colour.Id">@colour.Name</option>
-                    }
+        <option value="@colour.Id">@colour.Name</option>}
+                </select>
+            </div>
+            <div class="form-group">
+                <label asp-for="PrinterId"></label>
+                <select asp-for="PrinterId" class="form-control">
+                    @foreach (var printer in Model.Printers)
+                    {
+        <option value="@printer.Id">@printer.Brand</option>}
                 </select>
             </div>
             <input class="btn btn-primary" type="submit" value="Save" />

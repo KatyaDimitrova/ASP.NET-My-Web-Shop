@@ -20,10 +20,15 @@
         [Required]
         [Url]
         public string ImageUrl { get; init; }
+       
+        public decimal? Price { get; set; }
 
         [Display(Name = "Colour")]
         public int ColourId { get; init; }
 
         public IEnumerable<CartridgeColourViewModel> Colours { get; set; }
+        [Display(Name ="Printer")]
+        public int PrinterId { get; init; }
+        public IEnumerable<CartridgePrinterViewModel> Printers { get; set; }
     }
 }

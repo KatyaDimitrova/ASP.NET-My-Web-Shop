@@ -15,6 +15,7 @@ namespace MyWebShop.Data
 
         public DbSet<Cartridge> Cartridges { get; init; }
         public DbSet<Colour> Colours { get; set; }
+        public DbSet<Printer>Printers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -23,6 +24,14 @@ namespace MyWebShop.Data
                 .HasOne(c => c.Colour)
                 .WithMany(c => c.Cartridges)
                 .HasForeignKey(c => c.ColourId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+            builder
+                .Entity<Cartridge>()
+                .HasOne(c => c.Printer)
+                .WithMany(c => c.Cartridges)
+                .HasForeignKey(c => c.PrinterId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             base.OnModelCreating(builder);

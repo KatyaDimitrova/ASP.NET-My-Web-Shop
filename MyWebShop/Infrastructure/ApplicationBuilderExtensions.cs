@@ -38,6 +38,22 @@
                 new Colour {Name="Yellow"}
             });
 
+            if (data.Printers.Any())
+            {
+                return;
+            }
+
+            data.Printers.AddRange(new[]
+            {
+                new Printer {Brand="HP" },
+                new Printer {Brand="Brother"},
+                new Printer {Brand="Epson"},
+                new Printer {Brand="Canon"},
+                new Printer {Brand="Lexmark"},
+                new Printer {Brand="Samsung"},
+                new Printer {Brand="Xerox"}
+            });
+
             data.SaveChanges();
         }
 
