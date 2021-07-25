@@ -34,6 +34,14 @@ namespace MyWebShop.Data
                 .HasForeignKey(c => c.PrinterId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            builder.Entity<Cartridge>()
+             .Property(p => p.Price)
+             .HasPrecision(10, 2);
+
+            builder.Entity<AllCartridgesViewModel>()
+              .Property(p => p.Price)
+              .HasPrecision(10, 2);
+
             base.OnModelCreating(builder);
         }
 
