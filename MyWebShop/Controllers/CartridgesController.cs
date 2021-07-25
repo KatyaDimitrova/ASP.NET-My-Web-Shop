@@ -1,135 +1,155 @@
 ﻿namespace MyWebShop.Controllers
 {
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
-    using MyWebShop.Data;
-    using MyWebShop.Data.Models;
     using MyWebShop.Models.Cartridges;
-    using System.Collections.Generic;
-    using System.Linq;
+    using MyWebShop.Services.Cartridges;
+    using MyWebShop.Infrastructure;
+
 
     public class CartridgesController : Controller
     {
-        private readonly ApplicationDbContext data;
+       // private readonly ApplicationDbContext data;
+        private readonly ICartridgeService cartridges;
 
-        public CartridgesController(ApplicationDbContext data)
-            => this.data = data;
+        public CartridgesController(ICartridgeService cartridges)
+            => this.cartridges = cartridges;
 
 
-        public IActionResult Add() => View(new AddCartridgeFormModel
+        public IActionResult Add() => View(new CartridgeFormModel
         {
-            Colours = this.GetCartridgeColours(),
-            Printers = this.GetCartridgePrinters()
+            Colours = this.cartridges.AllColours(),
+            Printers=this.cartridges.AllPrinterBrands()
         });
+        
 
 
 
         [HttpPost]
-        public IActionResult Add(AddCartridgeFormModel cartridge)
+        public IActionResult Add(CartridgeFormModel cartridge)
         {
-            if (!this.data.Colours.Any(c => c.Id == cartridge.ColourId))
+            if (!this.cartridges.ColourExists(cartridge.ColourId))
             {
                 this.ModelState.AddModelError(nameof(cartridge.ColourId), "Colour does not exist.");
             }
-            if (!this.data.Printers.Any(p => p.Id == cartridge.PrinterId))
+            if (!this.cartridges.PrinterBrandExists(cartridge.PrinterId))
             {
-                this.ModelState.AddModelError(nameof(cartridge.PrinterId), "Printer does not exist.");
+                this.ModelState.AddModelError(nameof(cartridge.PrinterId), "Printer Brand does not exist.");
             }
 
             if (!ModelState.IsValid)
             {
-                cartridge.Colours = this.GetCartridgeColours();
-                cartridge.Printers = this.GetCartridgePrinters();
+                cartridge.Colours = this.cartridges.AllColours();
+                cartridge.Printers = this.cartridges.AllPrinterBrands();
 
                 return View(cartridge);
             }
 
-            var cartridgeData = new Cartridge
+            this.cartridges.Create(
+                cartridge.Model,
+                cartridge.Description,
+                cartridge.ImageUrl,
+                cartridge.Price,
+                cartridge.ColourId,
+                cartridge.PrinterId);
+
+            return RedirectToAction(nameof(All));
+
+        }
+
+
+        public IActionResult All([FromQuery]CartridgesSearchQueryModel query)
+        {
+            var queryResult = this.cartridges.All(
+                query.PrinterBrand,
+                query.SearchTerm,
+                query.Sorting,
+                query.CurrentPage,
+                CartridgesSearchQueryModel.CartridgesPerPage);
+
+            var printerBrands = this.cartridges.AllPrinterBrands();
+
+            query.PrintersBrands = printerBrands;
+            query.TotalCartridges = queryResult.TotalCartridges;
+            query.Cartridges = queryResult.Cartridges;
+
+
+            return View(query);
+
+        }
+
+        [Authorize]
+        public IActionResult Edit(int id)
+        {
+            var userId = this.User.Id();
+
+            if (!User.IsAdmin())
             {
+                return Unauthorized();
+            }
+
+            var cartridge = this.cartridges.Details(id);
+
+
+            return View(new CartridgeFormModel
+            {
+                
                 Model = cartridge.Model,
                 Description = cartridge.Description,
                 ImageUrl = cartridge.ImageUrl,
+                Price = cartridge.Price,
                 ColourId = cartridge.ColourId,
-                PrinterId = cartridge.PrinterId
-            };
+                Colours = this.cartridges.AllColours(),
+                PrinterId=cartridge.PrinterId,
+                Printers=this.cartridges.AllPrinterBrands()
+            });
+        }
 
-            this.data.Cartridges.Add(cartridgeData);
-            this.data.SaveChanges();
+        [HttpPost]
+        [Authorize]
+        public IActionResult Edit(int id, CartridgeFormModel cartridge)
+        {
+            
+
+            if (!User.IsAdmin())
+            {
+                return Unauthorized();
+            }
+
+            if (!this.cartridges.ColourExists(cartridge.ColourId))
+            {
+                this.ModelState.AddModelError(nameof(cartridge.ColourId), "Colour does not exist.");
+            }
+
+            if (!this.cartridges.PrinterBrandExists(cartridge.PrinterId))
+            {
+                this.ModelState.AddModelError(nameof(cartridge.PrinterId), "Printer Brand does not exist.");
+            }
+            if (!ModelState.IsValid)
+            {
+                cartridge.Colours = this.cartridges.AllColours();
+                cartridge.Printers = this.cartridges.AllPrinterBrands();
+
+                return View(cartridges);
+            }
+
+            if (!User.IsAdmin())
+            {
+                return BadRequest();
+            }
+
+            this.cartridges.Edit(
+                id,
+                cartridge.Model,
+                cartridge.Description,
+                cartridge.ImageUrl,
+                cartridge.Price,
+                cartridge.ColourId,
+                cartridge.PrinterId);
 
             return RedirectToAction(nameof(All));
         }
 
-        private IEnumerable<CartridgeColourViewModel> GetCartridgeColours()
-            => this.data
-            .Colours
-            .Select(c => new CartridgeColourViewModel
-            {
-                Id = c.Id,
-                Name = c.Name
-            })
-            .ToList();
 
-        private IEnumerable<CartridgePrinterViewModel> GetCartridgePrinters()
-            => this.data
-            .Printers
-            .Select(p => new CartridgePrinterViewModel
-            {
-                Id = p.Id,
-                Brand = p.Brand,
-                // Model = p.Model
-            });
-
-        public IActionResult All([FromQuery]CartridgesSearchQueryModel query)
-        {
-            var cartridgesQuery = this.data.Cartridges.AsQueryable();
-
-            if (!string.IsNullOrWhiteSpace(query.PrinterBrand))
-            {
-                cartridgesQuery = cartridgesQuery.Where(c => c.Printer.Brand == query.PrinterBrand);
-            }
-
-            if (!string.IsNullOrWhiteSpace(query.SearchTerm))
-            {
-                cartridgesQuery = cartridgesQuery.Where(c =>
-                      (c.Printer.Brand+" "+c.Model).ToLower().Contains(query.SearchTerm.ToLower()) ||
-                      c.Description.ToLower().Contains(query.SearchTerm.ToLower()));
-            };
-
-            cartridgesQuery = query.Sorting switch
-            {
-               CartridgesSorting.DateCreated=>cartridgesQuery.OrderByDescending(c=>c.Id),
-               CartridgesSorting.PrinterBrandAndModel=>cartridgesQuery.OrderBy(c=>c.Printer.Brand).ThenBy(c=>c.Model),
-               _=>cartridgesQuery.OrderByDescending(c=>c.Id)
-            };
-
-            var totalCartridges = cartridgesQuery.Count();
-
-            var cartridges = cartridgesQuery
-                .Skip((query.CurrentPage - 1) * CartridgesSearchQueryModel.CartridgesPerPage)
-                .Take(CartridgesSearchQueryModel.CartridgesPerPage)
-                .Select(x => new AllCartridgesViewModel
-            {
-                Model = x.Model,
-                Description = x.Description,
-                ImageUrl = x.ImageUrl,
-                Colour=x.Colour.Name,
-                Price=x.Price,
-                Printer=x.Printer.Brand
-            })
-            .ToList();
-
-            var printersBrands = this.data
-                .Printers
-                .Select(p => p.Brand)
-                .Distinct()
-                .OrderBy(br=>br)
-                .ToList();
-
-            query.TotalCartridges = totalCartridges;
-            query.PrintersBrands = printersBrands;
-            query.Cartridges = cartridges;
-
-            return View(query);         
-
-        }
     }
 }

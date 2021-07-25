@@ -1,0 +1,20 @@
+﻿@model IEnumerable<CartridgeServiceModel>
+
+<div class="row">
+    @foreach (var cartridge in Model)
+    {
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <img class="card-img-top" src="@cartridge.Price" alt="@cartridge.PrinterBrand @cartridge.Model">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-center">@cartridge.Price @cartridge.PrinterBrand @cartridge.Model (@cartridge.ColourName)</h5>
+                    <a asp-controller="Cars" asp-action="Details" asp-route-id="@cartridge.Id" class="btn btn-primary">View</a>
+                   
+                    <a asp-controller="Cartridges" asp-action="Edit" asp-route-id="@cartridge.Id" class="btn btn-warning">Edit</a>
+                    <a asp-controller="Cartridges" asp-action="Delete" asp-route-id="@cartridge.Id" class="btn btn-danger">Delete</a>
+                    
+                </div>
+            </div>
+        </div>
+    }
+</div>

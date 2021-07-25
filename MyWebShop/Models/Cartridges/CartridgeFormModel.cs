@@ -1,9 +1,10 @@
 ﻿namespace MyWebShop.Models.Cartridges
 {
+    using MyWebShop.Services.Cartridges;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
     using static Data.DataConstants;
-    public class AddCartridgeFormModel
+    public class CartridgeFormModel
     {
         [Required]
         [StringLength(CartridgeModelMaxLength,MinimumLength=CartridgeModelMinLength)]
@@ -21,14 +22,14 @@
         [Url]
         public string ImageUrl { get; init; }
        
-        public decimal? Price { get; set; }
+        public decimal Price { get; set; }
 
         [Display(Name = "Colour")]
         public int ColourId { get; init; }
 
-        public IEnumerable<CartridgeColourViewModel> Colours { get; set; }
+        public IEnumerable<CartridgeColourServiceModel> Colours { get; set; }
         [Display(Name ="Printer")]
         public int PrinterId { get; init; }
-        public IEnumerable<CartridgePrinterViewModel> Printers { get; set; }
+        public IEnumerable<CartridgePrinterServiceModel> Printers { get; set; }
     }
 }
