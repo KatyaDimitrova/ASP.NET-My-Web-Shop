@@ -9,6 +9,7 @@ namespace MyWebShop
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
     using MyWebShop.Data;
+    using MyWebShop.Data.Models;
     using MyWebShop.Infrastructure;
     using MyWebShop.Services.Cartridges;
 
@@ -24,7 +25,7 @@ namespace MyWebShop
                     .UseSqlServer(this.Configuration.GetConnectionString("DefaultConnection")));
 
             services
-                .AddDefaultIdentity<IdentityUser>(options =>
+                .AddDefaultIdentity<User>(options =>
                 {
                     options.Password.RequireDigit = false;
                     options.Password.RequireLowercase = false;

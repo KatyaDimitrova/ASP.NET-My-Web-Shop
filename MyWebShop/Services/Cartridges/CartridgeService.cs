@@ -60,6 +60,22 @@ namespace MyWebShop.Services.Cartridges
 
         }
 
+        public IEnumerable<LatestCartridgesServiceModel> Latest()
+            => this.data
+                .Cartridges
+                .OrderByDescending(c => c.Id)
+                .Select(c=>new LatestCartridgesServiceModel
+                {
+                    Id=c.Id,
+                    Model=c.Model,
+                    PrinterBrand=c.Printer.Brand,
+                    Price=c.Price,
+                    Colour=c.Colour.Name,
+                    ImageUrl=c.ImageUrl
+                })
+                .Take(3)
+                .ToList();
+
         public CartridgeDetailsServiceModel Details(int id)
             => this.data
                 .Cartridges
@@ -154,8 +170,8 @@ namespace MyWebShop.Services.Cartridges
                 .Any(p => p.Id == printerId);
 
 
-        private static IEnumerable<CartridgeServiceModel> GetCartridges(IQueryable<Cartridge> carQuery)
-            => carQuery
+        private static IEnumerable<CartridgeServiceModel> GetCartridges(IQueryable<Cartridge> cartridgeQuery)
+            => cartridgeQuery
                 .Select(c => new CartridgeServiceModel
                 {
                     Id = c.Id,

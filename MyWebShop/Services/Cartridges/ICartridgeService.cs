@@ -1,8 +1,6 @@
 ﻿using MyWebShop.Models.Cartridges;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
 
 namespace MyWebShop.Services.Cartridges
 {
@@ -14,6 +12,8 @@ namespace MyWebShop.Services.Cartridges
             CartridgesSorting sorting,
             int currentPage,
             int carsPerPage);
+
+        IEnumerable<LatestCartridgesServiceModel> Latest();
 
         CartridgeDetailsServiceModel Details(int cartridgeId);
 

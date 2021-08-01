@@ -6,33 +6,32 @@
     using MyWebShop.Data;
     using MyWebShop.Models;
     using MyWebShop.Models.Cartridges;
-   
+    using MyWebShop.Models.Home;
+    using MyWebShop.Services.Cartridges;
 
     public class HomeController : Controller
     {
+        private readonly ICartridgeService cartridges;
         private readonly ApplicationDbContext data;
 
-        public HomeController(ApplicationDbContext data)
-            => this.data = data;
+        public HomeController(ICartridgeService cartridges)
+        {
+            this.cartridges=cartridges;
+        }
 
 
         public IActionResult Index()
         {
-            var cartridges = this.data.Cartridges
-                .OrderBy(c => c.Id)
-                .Select(x => new AllCartridgesViewModel
-                {
-                    Model = x.Model,
-                    Description = x.Description,
-                    ImageUrl = x.ImageUrl,
-                    Colour = x.Colour.Name,
-                    Price = x.Price,
-                    Printer = x.Printer.Brand
-                })
-                .Take(3)
-                .ToList();
+            var latestCartridges = this.cartridges
+                 .Latest()
+                 .ToList();
 
-            return this.View(cartridges);
+
+
+            return View(new IndexViewModel
+            {
+                Cartridges = latestCartridges
+            }) ;
         }
         
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

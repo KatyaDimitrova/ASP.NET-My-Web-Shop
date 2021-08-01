@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MyWebShop.Data;
 
 namespace MyWebShop.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210801152210_UserName")]
+    partial class UserName
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -208,50 +210,6 @@ namespace MyWebShop.Data.Migrations
                     b.ToTable("Colours");
                 });
 
-            modelBuilder.Entity("MyWebShop.Data.Models.Order", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<DateTime>("OrderDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Orders");
-                });
-
-            modelBuilder.Entity("MyWebShop.Data.Models.OrderCartridge", b =>
-                {
-                    b.Property<string>("OrderId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("CartridgeId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int?>("CartridgeId1")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("OrderId1")
-                        .HasColumnType("int");
-
-                    b.HasKey("OrderId", "CartridgeId");
-
-                    b.HasIndex("CartridgeId1");
-
-                    b.HasIndex("OrderId1");
-
-                    b.ToTable("OrdersCartridges");
-                });
-
             modelBuilder.Entity("MyWebShop.Data.Models.Printer", b =>
                 {
                     b.Property<int>("Id")
@@ -274,14 +232,6 @@ namespace MyWebShop.Data.Migrations
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
-
-                    b.Property<string>("Address")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("City")
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -314,10 +264,6 @@ namespace MyWebShop.Data.Migrations
 
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Phone")
-                        .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
 
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
@@ -418,57 +364,14 @@ namespace MyWebShop.Data.Migrations
                     b.Navigation("Printer");
                 });
 
-            modelBuilder.Entity("MyWebShop.Data.Models.Order", b =>
-                {
-                    b.HasOne("MyWebShop.Data.Models.User", "User")
-                        .WithMany("Orders")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("MyWebShop.Data.Models.OrderCartridge", b =>
-                {
-                    b.HasOne("MyWebShop.Data.Models.Cartridge", "Cartridge")
-                        .WithMany("OrderCartridges")
-                        .HasForeignKey("CartridgeId1")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("MyWebShop.Data.Models.Order", "Order")
-                        .WithMany("OrderCartridges")
-                        .HasForeignKey("OrderId1")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Cartridge");
-
-                    b.Navigation("Order");
-                });
-
-            modelBuilder.Entity("MyWebShop.Data.Models.Cartridge", b =>
-                {
-                    b.Navigation("OrderCartridges");
-                });
-
             modelBuilder.Entity("MyWebShop.Data.Models.Colour", b =>
                 {
                     b.Navigation("Cartridges");
                 });
 
-            modelBuilder.Entity("MyWebShop.Data.Models.Order", b =>
-                {
-                    b.Navigation("OrderCartridges");
-                });
-
             modelBuilder.Entity("MyWebShop.Data.Models.Printer", b =>
                 {
                     b.Navigation("Cartridges");
-                });
-
-            modelBuilder.Entity("MyWebShop.Data.Models.User", b =>
-                {
-                    b.Navigation("Orders");
                 });
 #pragma warning restore 612, 618
         }

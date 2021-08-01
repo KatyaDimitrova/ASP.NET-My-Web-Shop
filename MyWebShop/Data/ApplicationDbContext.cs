@@ -6,7 +6,7 @@ namespace MyWebShop.Data
     using Microsoft.EntityFrameworkCore;
     using MyWebShop.Data.Models;
 
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : IdentityDbContext<User>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -16,6 +16,8 @@ namespace MyWebShop.Data
         public DbSet<Cartridge> Cartridges { get; init; }
         public DbSet<Colour> Colours { get; set; }
         public DbSet<Printer>Printers { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderCartridge> OrdersCartridges { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -35,16 +37,25 @@ namespace MyWebShop.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Cartridge>()
+               .HasMany(p => p.OrderCartridges)
+                .WithOne(op => op.Cartridge)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Cartridge>()
              .Property(p => p.Price)
              .HasPrecision(10, 2);
 
-            builder.Entity<AllCartridgesViewModel>()
-              .Property(p => p.Price)
-              .HasPrecision(10, 2);
+            builder.Entity<OrderCartridge>()
+              .HasKey(oc => new { oc.OrderId, oc.CartridgeId });
+
+            builder.Entity<Order>()
+                .HasMany(o => o.OrderCartridges)
+                .WithOne(op => op.Order)
+                .OnDelete(DeleteBehavior.Restrict);
 
             base.OnModelCreating(builder);
+
         }
 
-        public DbSet<MyWebShop.Models.Cartridges.AllCartridgesViewModel> AllCartridgesViewModel { get; set; }
     }
 }

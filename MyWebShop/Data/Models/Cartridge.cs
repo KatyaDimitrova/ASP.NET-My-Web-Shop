@@ -1,5 +1,6 @@
 ﻿namespace MyWebShop.Data.Models
 {
+    using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
 
     using static DataConstants;
@@ -18,5 +19,6 @@
         public Colour Colour { get; init; }
         public int PrinterId { get; set; }
         public Printer Printer { get; init; }
+       public IEnumerable<OrderCartridge> OrderCartridges { get; set; } = new List<OrderCartridge>();
     }
 }

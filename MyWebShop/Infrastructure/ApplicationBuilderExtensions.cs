@@ -15,19 +15,28 @@
         public static IApplicationBuilder PrepareDatabase(
            this IApplicationBuilder app)
         {
-            using var scopedServices = app.ApplicationServices.CreateScope();
+            using var serviceScope = app.ApplicationServices.CreateScope();
+            var services = serviceScope.ServiceProvider;
 
-            var data = scopedServices.ServiceProvider.GetService<ApplicationDbContext>();
+            MigrateDatabase(services);
 
-            data.Database.Migrate();
-
-            SeedCategories(data);
+            SeedCategories(services);
+            SeedAdministrator(services);
 
             return app;
         }
 
-        public static void SeedCategories(ApplicationDbContext data)
+        private static void MigrateDatabase(IServiceProvider services)
         {
+            var data = services.GetRequiredService<ApplicationDbContext>();
+
+            data.Database.Migrate();
+        }
+
+        public static void SeedCategories(IServiceProvider services)
+        {
+            var data = services.GetRequiredService<ApplicationDbContext>();
+
             if (data.Colours.Any())
             {
                 return;
@@ -62,7 +71,7 @@
 
         private static void SeedAdministrator(IServiceProvider services)
         {
-            var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
+            var userManager = services.GetRequiredService<UserManager<User>>();
             var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
 
             Task
@@ -77,14 +86,17 @@
 
                     await roleManager.CreateAsync(role);
 
-                    const string adminEmail = "admin@admin.com";
+                    const string adminEmail = "admin@web.com";
                     const string adminPassword = "admin123";
 
-                    var user = new IdentityUser
+                    var user = new User
                     {
                         Email = adminEmail,
                         UserName = adminEmail,
-                        //FullName = "Admin"
+                        FullName = "Admin",
+                        City = "Varna",
+                        Address = "City of Varna",
+                        Phone = "0899999999"
                     };
 
                     await userManager.CreateAsync(user, adminPassword);
